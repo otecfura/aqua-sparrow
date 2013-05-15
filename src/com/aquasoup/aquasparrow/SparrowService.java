@@ -1,8 +1,11 @@
 package com.aquasoup.aquasparrow;
 
+import ioio.lib.api.exception.ConnectionLostException;
+import ioio.lib.util.BaseIOIOLooper;
+import ioio.lib.util.IOIOLooper;
+import ioio.lib.util.android.IOIOService;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -10,10 +13,14 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-public class SparrowService extends Service {
+public class SparrowService extends IOIOService {
+    // private static final int PIN = 6;
+
     private NotificationCompat.Builder notificationBuilder;
     private Context ctx = SparrowService.this;
     private Resources res;
+
+    // private DigitalOutput pin_;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -21,13 +28,29 @@ public class SparrowService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public void onStart(Intent intent, int startId) {
+	super.onStart(intent, startId);
 	res = getResources();
 	Notification notice = createNotification();
 	notice.flags |= Notification.FLAG_NO_CLEAR;
 	startForeground(SparrowConstants.NOTIFICATION_ID, notice);
 	sendLogToUI(res.getString(R.string.service_started));
-	return START_STICKY;
+    }
+
+    @Override
+    protected IOIOLooper createIOIOLooper() {
+	return new BaseIOIOLooper() {
+
+	    @Override
+	    protected void setup() throws ConnectionLostException, InterruptedException {
+		// pin_ = ioio_.openDigitalOutput(PIN, false);
+	    }
+
+	    @Override
+	    public void loop() throws ConnectionLostException, InterruptedException {
+
+	    }
+	};
     }
 
     private Notification createNotification() {
