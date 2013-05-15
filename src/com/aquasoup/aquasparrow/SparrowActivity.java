@@ -1,7 +1,5 @@
 package com.aquasoup.aquasparrow;
 
-import java.util.LinkedList;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,101 +11,103 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.util.LinkedList;
+
 public class SparrowActivity extends Activity {
 
     private Context ctx = SparrowActivity.this;
     private TextView logTextView;
     private BroadcastReceiver LogsReceiver = new BroadcastReceiver() {
-	@Override
-	public void onReceive(Context context, Intent intent) {
-	    String log = intent.getStringExtra(SparrowConstants.STRING_ID);
-	    Logger.addLog(log);
-	    updateLogTextView();
-	}
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String log = intent.getStringExtra(SparrowConstants.STRING_ID);
+            Logger.addLog(log);
+            updateLogTextView();
+        }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
-	setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-	RegisterLogsReceiver();
+        RegisterLogsReceiver();
 
-	logTextView = (TextView) findViewById(R.id.log_text_view);
+        logTextView = (TextView) findViewById(R.id.log_text_view);
 
-	updateLogTextView();
+        updateLogTextView();
     }
 
     @Override
     public void onDestroy() {
-	super.onDestroy();
-	unregisterReceiver(LogsReceiver);
+        super.onDestroy();
+        unregisterReceiver(LogsReceiver);
     }
 
     private void RegisterLogsReceiver() {
-	IntentFilter filter = new IntentFilter();
-	filter.addAction(SparrowConstants.ACTION_LOG);
-	registerReceiver(LogsReceiver, filter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SparrowConstants.ACTION_LOG);
+        registerReceiver(LogsReceiver, filter);
     }
 
     private void updateLogTextView() {
-	logTextView.setText(Logger.getLogs());
+        logTextView.setText(Logger.getLogs());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-	MenuInflater inflater = getMenuInflater();
-	inflater.inflate(R.menu.activity_main, menu);
-	return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-	Intent IntentService = new Intent(ctx, SparrowService.class);
+        Intent IntentService = new Intent(ctx, SparrowService.class);
 
-	switch (item.getItemId()) {
+        switch (item.getItemId()) {
 
-	case R.id.start:
-	    startService(IntentService);
-	    break;
+            case R.id.start:
+                startService(IntentService);
+                break;
 
-	case R.id.stop:
-	    stopService(IntentService);
-	    break;
+            case R.id.stop:
+                stopService(IntentService);
+                break;
 
-	}
+        }
 
-	return true;
+        return true;
     }
 
     private static class Logger {
-	private static final int LOGGER_SIZE = 20;
-	private static final LinkedList<String> logsList = new LinkedList<String>();
+        private static final int LOGGER_SIZE = 20;
+        private static final LinkedList<String> logsList = new LinkedList<String>();
 
-	private static void addLog(String log) {
-	    int actualLoggerSize = logsList.size();
+        private static void addLog(String log) {
+            int actualLoggerSize = logsList.size();
 
-	    if (isLoggerFull(actualLoggerSize)) {
-		logsList.removeFirst();
-	    }
+            if (isLoggerFull(actualLoggerSize)) {
+                logsList.removeFirst();
+            }
 
-	    logsList.addLast(log);
-	}
+            logsList.addLast(log);
+        }
 
-	private static boolean isLoggerFull(int actualLoggerSize) {
+        private static boolean isLoggerFull(int actualLoggerSize) {
 
-	    return actualLoggerSize >= LOGGER_SIZE;
-	}
+            return actualLoggerSize >= LOGGER_SIZE;
+        }
 
-	private static String getLogs() {
-	    String logs = "";
+        private static String getLogs() {
+            String logs = "";
 
-	    for (String log : logsList) {
-		logs = logs + log + "\n";
-	    }
+            for (String log : logsList) {
+                logs = logs + log + "\n";
+            }
 
-	    return logs;
-	}
+            return logs;
+        }
     }
 
 }
