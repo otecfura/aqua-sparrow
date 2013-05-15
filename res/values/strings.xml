@@ -8,5 +8,5 @@
 	
 	<string name="service_started">Service started</string>
 	<string name="service_destroyed">Service destroyed</string>
-	
+	<string name="command_obtained">Command from SMS obtained</string>
 </resources>

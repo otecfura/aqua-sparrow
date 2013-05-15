@@ -81,7 +81,7 @@ public class SparrowActivity extends Activity {
     }
 
     private static class Logger {
-	private static final int LOGGER_SIZE = 10;
+	private static final int LOGGER_SIZE = 20;
 	private static final LinkedList<String> logsList = new LinkedList<String>();
 
 	private static void addLog(String log) {

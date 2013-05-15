@@ -1,26 +1,35 @@
 package com.aquasoup.aquasparrow;
 
+import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOService;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 public class SparrowService extends IOIOService {
-    // private static final int PIN = 6;
+    private static final int PIN = 6;
 
     private NotificationCompat.Builder notificationBuilder;
     private Context ctx = SparrowService.this;
     private Resources res;
+    private DigitalOutput valvePin;
 
-    // private DigitalOutput pin_;
+    private BroadcastReceiver SmsReceiver = new BroadcastReceiver() {
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    sendLogToUI(res.getString(R.string.command_obtained));
+	}
+    };
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,7 +43,16 @@ public class SparrowService extends IOIOService {
 	Notification notice = createNotification();
 	notice.flags |= Notification.FLAG_NO_CLEAR;
 	startForeground(SparrowConstants.NOTIFICATION_ID, notice);
+	RegisterLogsReceiver();
 	sendLogToUI(res.getString(R.string.service_started));
+    }
+
+    @Override
+    public void onDestroy() {
+	super.onDestroy();
+	stopForeground(true);
+	unregisterReceiver(SmsReceiver);
+	sendLogToUI(res.getString(R.string.service_destroyed));
     }
 
     @Override
@@ -43,7 +61,7 @@ public class SparrowService extends IOIOService {
 
 	    @Override
 	    protected void setup() throws ConnectionLostException, InterruptedException {
-		// pin_ = ioio_.openDigitalOutput(PIN, false);
+		valvePin = ioio_.openDigitalOutput(PIN, false);
 	    }
 
 	    @Override
@@ -83,11 +101,18 @@ public class SparrowService extends IOIOService {
 	sendBroadcast(intent);
     }
 
-    @Override
-    public void onDestroy() {
-	super.onDestroy();
-	stopForeground(true);
-	sendLogToUI(res.getString(R.string.service_destroyed));
+    private void openValve() throws ConnectionLostException {
+	valvePin.write(true);
+    }
+
+    private void closeValve() throws ConnectionLostException {
+	valvePin.write(false);
+    }
+
+    private void RegisterLogsReceiver() {
+	IntentFilter filter = new IntentFilter();
+	filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+	registerReceiver(SmsReceiver, filter);
     }
 
 }
