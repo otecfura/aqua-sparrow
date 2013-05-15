@@ -12,12 +12,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 public class SparrowService extends IOIOService {
     private static final int PIN = 6;
+    private static final long TIME_TO_FINISH = 5000; // 5s
+    private static final long TIME_TICK = 1000;
 
     private NotificationCompat.Builder notificationBuilder;
     private Context ctx = SparrowService.this;
@@ -28,6 +31,22 @@ public class SparrowService extends IOIOService {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 	    sendLogToUI(res.getString(R.string.command_obtained));
+	    TimerTickToCloseValve.start();
+	}
+    };
+
+    private CountDownTimer TimerTickToCloseValve = new CountDownTimer(TIME_TO_FINISH, TIME_TICK) {
+
+	@Override
+	public void onTick(long millisUntilFinished) {
+	    if (millisUntilFinished == TIME_TO_FINISH) {
+		openValve();
+	    }
+	}
+
+	@Override
+	public void onFinish() {
+	    closeValve();
 	}
     };
 
@@ -101,12 +120,14 @@ public class SparrowService extends IOIOService {
 	sendBroadcast(intent);
     }
 
-    private void openValve() throws ConnectionLostException {
-	valvePin.write(true);
+    private void openValve() {
+	sendLogToUI(res.getString(R.string.open_valve));
+	// valvePin.write(true);
     }
 
-    private void closeValve() throws ConnectionLostException {
-	valvePin.write(false);
+    private void closeValve() {
+	sendLogToUI(res.getString(R.string.close_valve));
+	// valvePin.write(false);
     }
 
     private void RegisterLogsReceiver() {
