@@ -1,4 +1,4 @@
-water-sparrow
+aqua-sparrow
 =============
 
 Watering system project powered by an Android and arduino.
