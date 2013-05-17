@@ -11,7 +11,6 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
@@ -19,11 +18,11 @@ import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOService;
 
 public class SparrowService extends IOIOService {
-    private static final int PIN = 6;
+    private static final int IOIO_BOARD_PIN_NUMBER = 6;
     private static final long TIME_TO_FINISH = 5000; // 5s
     private static final long TIME_TICK = 1000;
-    private static final String INTENT_SMS_FILTER="android.provider.Telephony.SMS_RECEIVED";
-    private NotificationCompat.Builder notificationBuilder;
+    private static final String INTENT_SMS_FILTER = "android.provider.Telephony.SMS_RECEIVED";
+
     private Context ctx = SparrowService.this;
     private Resources res;
     private DigitalOutput valvePin;
@@ -79,7 +78,7 @@ public class SparrowService extends IOIOService {
 
             @Override
             protected void setup() throws ConnectionLostException, InterruptedException {
-                valvePin = ioio_.openDigitalOutput(PIN, false);
+                valvePin = ioio_.openDigitalOutput(IOIO_BOARD_PIN_NUMBER, false);
             }
 
             @Override
@@ -101,7 +100,7 @@ public class SparrowService extends IOIOService {
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notificationBuilder = new NotificationCompat.Builder(ctx);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ctx);
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setContentIntent(resultPendingIntent);
         notificationBuilder.setContentTitle(notificationTitle);
