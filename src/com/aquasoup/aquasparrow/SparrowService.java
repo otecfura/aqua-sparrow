@@ -22,7 +22,7 @@ public class SparrowService extends IOIOService {
     private static final int PIN = 6;
     private static final long TIME_TO_FINISH = 5000; // 5s
     private static final long TIME_TICK = 1000;
-
+    private static final String INTENT_SMS_FILTER="android.provider.Telephony.SMS_RECEIVED";
     private NotificationCompat.Builder notificationBuilder;
     private Context ctx = SparrowService.this;
     private Resources res;
@@ -32,6 +32,7 @@ public class SparrowService extends IOIOService {
         @Override
         public void onReceive(Context context, Intent intent) {
             sendLogToUI(res.getString(R.string.command_obtained));
+            openValve();
             TimerTickToCloseValve.start();
         }
     };
@@ -40,9 +41,6 @@ public class SparrowService extends IOIOService {
 
         @Override
         public void onTick(long millisUntilFinished) {
-            if (millisUntilFinished == TIME_TO_FINISH) {
-                openValve();
-            }
         }
 
         @Override
@@ -133,7 +131,7 @@ public class SparrowService extends IOIOService {
 
     private void RegisterLogsReceiver() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        filter.addAction(INTENT_SMS_FILTER);
         registerReceiver(SmsReceiver, filter);
     }
 
