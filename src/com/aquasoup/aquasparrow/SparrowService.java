@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -106,7 +108,9 @@ public class SparrowService extends IOIOService {
         notificationBuilder.setContentTitle(notificationTitle);
         notificationBuilder.setContentText(notificationText);
         notificationBuilder.setOngoing(true);
-        notificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+        notificationBuilder.setSmallIcon(R.drawable.sparrow_notif);
+        Bitmap largeIcon = BitmapFactory.decodeResource(res, R.drawable.ic_launcher);
+        notificationBuilder.setLargeIcon(largeIcon);
 
         return notificationBuilder.build();
     }
