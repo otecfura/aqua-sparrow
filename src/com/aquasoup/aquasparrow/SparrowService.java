@@ -60,7 +60,6 @@ public class SparrowService extends IOIOService {
         super.onStart(intent, startId);
         res = getResources();
         Notification notice = createNotification();
-        notice.flags |= Notification.FLAG_NO_CLEAR;
         startForeground(SparrowConstants.NOTIFICATION_ID, notice);
         RegisterLogsReceiver();
         sendLogToUI(res.getString(R.string.service_started));
@@ -109,7 +108,7 @@ public class SparrowService extends IOIOService {
         notificationBuilder.setContentText(notificationText);
         notificationBuilder.setOngoing(true);
         notificationBuilder.setSmallIcon(R.drawable.sparrow_notif);
-        Bitmap largeIcon = BitmapFactory.decodeResource(res, R.drawable.ic_launcher);
+        Bitmap largeIcon = BitmapFactory.decodeResource(res, R.drawable.sparrow_notif);
         notificationBuilder.setLargeIcon(largeIcon);
 
         return notificationBuilder.build();
