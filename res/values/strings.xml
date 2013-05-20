@@ -12,4 +12,7 @@
 	<string name="command_obtained">Command from SMS obtained</string>
 	<string name="open_valve">Opening valve</string>
 	<string name="close_valve">Closing valve</string>
+    <string name="bad_command">Bad command from SMS</string>
+    <string name="register_listener">Registering listener</string>
+    <string name="receiver_exception">Receiver exception</string>
 </resources>

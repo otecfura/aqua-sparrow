@@ -9,10 +9,12 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.telephony.SmsMessage;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
@@ -28,13 +30,31 @@ public class SparrowService extends IOIOService {
     private Context ctx = SparrowService.this;
     private Resources res;
     private DigitalOutput valvePin;
+    private SparrowSmsParser sparrowSmsParser;
 
     private BroadcastReceiver SmsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String messageBody="";
+            SmsMessage[] smsMessage = null;
+            Bundle bundle = intent.getExtras();
+
             sendLogToUI(res.getString(R.string.command_obtained));
-            openValve();
-            TimerTickToCloseValve.start();
+
+            if (bundle != null){
+                try{
+                    Object[] pdus = (Object[]) bundle.get("pdus");
+                    smsMessage = new SmsMessage[pdus.length];
+                    for(int i=0; i<smsMessage.length; i++){
+                        smsMessage[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+                        messageBody = smsMessage[i].getMessageBody();
+                    }
+                }catch(Exception e){
+                    sendLogToUI("receive exception");
+                }
+
+            sparrowSmsParser.checkSmsCode(messageBody);
+        }
         }
     };
 
@@ -50,6 +70,20 @@ public class SparrowService extends IOIOService {
         }
     };
 
+    private SparrowSmsParser.SmsListener SmsListener=new SparrowSmsParser.SmsListener() {
+        @Override
+        public void openValve() {
+            sendLogToUI(res.getString(R.string.open_valve));
+            // valvePin.write(true);
+            TimerTickToCloseValve.start();
+        }
+
+        @Override
+        public void badSmsCode() {
+            sendLogToUI(res.getString(R.string.bad_command));
+        }
+};
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -62,7 +96,14 @@ public class SparrowService extends IOIOService {
         Notification notice = createNotification();
         startForeground(SparrowConstants.NOTIFICATION_ID, notice);
         RegisterLogsReceiver();
+        createAndAddListenerToParser();
         sendLogToUI(res.getString(R.string.service_started));
+    }
+
+    private void createAndAddListenerToParser(){
+        sendLogToUI(res.getString(R.string.register_listener));
+        sparrowSmsParser=new SparrowSmsParser();
+        sparrowSmsParser.addListener(SmsListener);
     }
 
     @Override
@@ -87,6 +128,11 @@ public class SparrowService extends IOIOService {
 
             }
         };
+    }
+
+    private void closeValve(){
+        sendLogToUI(res.getString(R.string.close_valve));
+        // valvePin.write(true);
     }
 
     private Notification createNotification() {
@@ -119,16 +165,6 @@ public class SparrowService extends IOIOService {
         intent.setAction(SparrowConstants.ACTION_LOG);
         intent.putExtra(SparrowConstants.STRING_ID, log);
         sendBroadcast(intent);
-    }
-
-    private void openValve() {
-        sendLogToUI(res.getString(R.string.open_valve));
-        // valvePin.write(true);
-    }
-
-    private void closeValve() {
-        sendLogToUI(res.getString(R.string.close_valve));
-        // valvePin.write(false);
     }
 
     private void RegisterLogsReceiver() {
