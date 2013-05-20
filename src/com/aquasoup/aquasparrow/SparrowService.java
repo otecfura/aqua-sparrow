@@ -50,7 +50,7 @@ public class SparrowService extends IOIOService {
                         messageBody = smsMessage[i].getMessageBody();
                     }
                 }catch(Exception e){
-                    sendLogToUI("receive exception");
+                    sendLogToUI(res.getString(R.string.receiver_exception));
                 }
 
             sparrowSmsParser.checkSmsCode(messageBody);
