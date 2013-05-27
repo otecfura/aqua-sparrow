@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsMessage;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
@@ -141,15 +140,12 @@ public class SparrowService extends IOIOService {
 
         Intent resultIntent = new Intent(ctx, SparrowActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(ctx);
-        stackBuilder.addParentStack(SparrowActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent showIntent = new Intent(ctx, SparrowActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, showIntent, 0);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ctx);
         notificationBuilder.setWhen(System.currentTimeMillis());
-        notificationBuilder.setContentIntent(resultPendingIntent);
+        notificationBuilder.setContentIntent(contentIntent);
         notificationBuilder.setContentTitle(notificationTitle);
         notificationBuilder.setContentText(notificationText);
         notificationBuilder.setOngoing(true);
@@ -157,7 +153,7 @@ public class SparrowService extends IOIOService {
         Bitmap largeIcon = BitmapFactory.decodeResource(res, R.drawable.sparrow_notif);
         notificationBuilder.setLargeIcon(largeIcon);
 
-        return notificationBuilder.build();
+        return notificationBuilder.getNotification();
     }
 
     private void sendLogToUI(String log) {
