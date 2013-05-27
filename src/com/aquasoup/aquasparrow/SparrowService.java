@@ -140,8 +140,7 @@ public class SparrowService extends IOIOService {
 
         Intent resultIntent = new Intent(ctx, SparrowActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        Intent showIntent = new Intent(ctx, SparrowActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, showIntent, 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, resultIntent, 0);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ctx);
         notificationBuilder.setWhen(System.currentTimeMillis());
