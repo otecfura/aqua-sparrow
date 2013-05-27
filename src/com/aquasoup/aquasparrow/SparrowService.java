@@ -137,7 +137,7 @@ public class SparrowService extends IOIOService {
     private Notification createNotification() {
         String notificationTitle = res.getString(R.string.notification_title);
         String notificationText = res.getString(R.string.notification_text);
-
+        //compat
         Intent resultIntent = new Intent(ctx, SparrowActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, resultIntent, 0);
