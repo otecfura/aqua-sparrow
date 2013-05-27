@@ -14,15 +14,12 @@ local.properties
 # Eclipse project files
 .classpath
 .project
-
 # IDEA Ignores
 *.iml
 *.ipr
 *.iws
 .idea/
-local.properties
-
 # Generic Android ignores
-bin/
 target
-gen/
+/gen-external-apklibs/
+/out/

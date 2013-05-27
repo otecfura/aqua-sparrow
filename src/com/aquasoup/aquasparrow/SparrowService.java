@@ -31,31 +31,35 @@ public class SparrowService extends IOIOService {
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
 
-    private BroadcastReceiver SmsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String messageBody="";
-            SmsMessage[] smsMessage = null;
-            Bundle bundle = intent.getExtras();
+    private BroadcastReceiver SmsReceiver;
 
-            sendLogToUI(res.getString(R.string.command_obtained));
+    {
+        SmsReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String messageBody="";
+                SmsMessage[] smsMessage=null;
+                Bundle bundle= intent.getExtras();
 
-            if (bundle != null){
-                try{
-                    Object[] pdus = (Object[]) bundle.get("pdus");
-                    smsMessage = new SmsMessage[pdus.length];
-                    for(int i=0; i<smsMessage.length; i++){
-                        smsMessage[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-                        messageBody = smsMessage[i].getMessageBody();
+                sendLogToUI(res.getString(R.string.command_obtained));
+
+                if (bundle != null) {
+                    try {
+                        Object[] pdus = (Object[]) bundle.get("pdus");
+                        smsMessage = new SmsMessage[pdus.length];
+                        for (int i = 0; i < smsMessage.length; i++) {
+                            smsMessage[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                            messageBody = smsMessage[i].getMessageBody();
+                        }
+                    } catch (Exception e) {
+                        sendLogToUI(res.getString(R.string.receiver_exception));
                     }
-                }catch(Exception e){
-                    sendLogToUI(res.getString(R.string.receiver_exception));
-                }
 
-            sparrowSmsParser.checkSmsCode(messageBody);
-        }
-        }
-    };
+                    sparrowSmsParser.checkSmsCode(messageBody);
+                }
+            }
+        };
+    }
 
     private CountDownTimer TimerTickToCloseValve = new CountDownTimer(TIME_TO_FINISH, TIME_TICK) {
 
