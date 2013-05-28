@@ -15,4 +15,5 @@
     <string name="bad_command">Bad command from SMS</string>
     <string name="register_listener">Registering listener</string>
     <string name="receiver_exception">Receiver exception</string>
+    <string name="connection_lost">Receiver exception</string>
 </resources>

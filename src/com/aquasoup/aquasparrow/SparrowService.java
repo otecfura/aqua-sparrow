@@ -31,7 +31,7 @@ public class SparrowService extends IOIOService {
     private Resources res;
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
-    DigitalOutput DigitalPin;
+    private DigitalOutput digitalOutputPinLed;
     private BroadcastReceiver SmsReceiver;
 
     {
@@ -77,8 +77,7 @@ public class SparrowService extends IOIOService {
     private SparrowSmsParser.SmsListener SmsListener=new SparrowSmsParser.SmsListener() {
         @Override
         public void openValve() {
-            sendLogToUI(res.getString(R.string.open_valve));
-            // valvePin.write(true);
+            SparrowService.this.openValve();
             TimerTickToCloseValve.start();
         }
 
@@ -87,6 +86,32 @@ public class SparrowService extends IOIOService {
             sendLogToUI(res.getString(R.string.bad_command));
         }
 };
+
+    private void openValve(){
+        sendLogToUI(res.getString(R.string.open_valve));
+        turnLedOn();
+    }
+
+    private void closeValve(){
+        sendLogToUI(res.getString(R.string.close_valve));
+        turnLedOff();
+    }
+
+    private void turnLedOn(){
+        try {
+            digitalOutputPinLed.write(false);
+        } catch (ConnectionLostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void turnLedOff(){
+        try {
+            digitalOutputPinLed.write(true);
+        } catch (ConnectionLostException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -124,19 +149,18 @@ public class SparrowService extends IOIOService {
         return new BaseIOIOLooper() {
 
             @Override
-            protected void setup() throws ConnectionLostException, InterruptedException {
-                valvePin = ioio_.openDigitalOutput(IOIO_BOARD_PIN_NUMBER, true);
+            protected void setup(){
+                try {
+                    digitalOutputPinLed = ioio_.openDigitalOutput(IOIO.LED_PIN,true);
+                } catch (ConnectionLostException e) {
+                    sendLogToUI(res.getString(R.string.connection_lost));
+                }
             }
 
             @Override
-            public void loop() throws ConnectionLostException, InterruptedException {
+            public void loop(){
             }
         };
-    }
-
-    private void closeValve(){
-        sendLogToUI(res.getString(R.string.close_valve));
-        // valvePin.write(true);
     }
 
     private Notification createNotification() {
