@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
 import ioio.lib.api.DigitalOutput;
+import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
@@ -30,7 +31,7 @@ public class SparrowService extends IOIOService {
     private Resources res;
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
-
+    DigitalOutput DigitalPin;
     private BroadcastReceiver SmsReceiver;
 
     {
@@ -119,16 +120,16 @@ public class SparrowService extends IOIOService {
 
     @Override
     protected IOIOLooper createIOIOLooper() {
+
         return new BaseIOIOLooper() {
 
             @Override
             protected void setup() throws ConnectionLostException, InterruptedException {
-                valvePin = ioio_.openDigitalOutput(IOIO_BOARD_PIN_NUMBER, false);
+                valvePin = ioio_.openDigitalOutput(IOIO_BOARD_PIN_NUMBER, true);
             }
 
             @Override
             public void loop() throws ConnectionLostException, InterruptedException {
-
             }
         };
     }
