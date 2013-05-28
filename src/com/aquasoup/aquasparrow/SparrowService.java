@@ -122,11 +122,12 @@ public class SparrowService extends IOIOService {
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         res = getResources();
+        sendLogToUI(res.getString(R.string.service_started));
         Notification notice = createNotification();
         startForeground(SparrowConstants.NOTIFICATION_ID, notice);
         RegisterLogsReceiver();
         createAndAddListenerToParser();
-        sendLogToUI(res.getString(R.string.service_started));
+
     }
 
     private void createAndAddListenerToParser(){
