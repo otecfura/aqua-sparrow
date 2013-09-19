@@ -22,8 +22,8 @@ import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOService;
 
 public class SparrowService extends IOIOService {
-    private static final int IOIO_BOARD_PIN_NUMBER = 6;
-    private static final long TIME_TO_FINISH = 5000; // 5s
+	private static final int IOIO_BOARD_PIN_NUMBER = 13;
+    private static final long TIME_TO_FINISH = 1000*480;
     private static final long TIME_TICK = 1000;
     private static final String INTENT_SMS_FILTER = "android.provider.Telephony.SMS_RECEIVED";
 
@@ -124,7 +124,7 @@ public class SparrowService extends IOIOService {
         res = getResources();
         sendLogToUI(res.getString(R.string.service_started));
         Notification notice = createNotification();
-        startForeground(SparrowConstants.NOTIFICATION_ID, notice);
+        //startForeground(SparrowConstants.NOTIFICATION_ID, notice);
         RegisterLogsReceiver();
         createAndAddListenerToParser();
 
