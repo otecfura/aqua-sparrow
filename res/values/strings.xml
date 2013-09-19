@@ -8,7 +8,9 @@
 	
 	<string name="service_started">Service started</string>
 	<string name="service_destroyed">Service destroyed</string>
-	
+    <string name="valve_exception_close">Unable to close valve</string>
+    <string name="valve_exception_open">Unable to open valve</string>
+
 	<string name="command_obtained">Command from SMS obtained</string>
 	<string name="open_valve">Opening valve</string>
 	<string name="close_valve">Closing valve</string>
