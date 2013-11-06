@@ -32,11 +32,9 @@ public class SparrowService extends IOIOService {
     private Resources res;
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
-    private BroadcastReceiver SmsReceiver;
     private NotificationManager nm;
 
-    {
-        SmsReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver SmsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String messageBody="";
@@ -61,7 +59,7 @@ public class SparrowService extends IOIOService {
                 }
             }
         };
-    }
+
 
     private CountDownTimer TimerTickToCloseValve = new CountDownTimer(TIME_TO_FINISH, TIME_TICK) {
 
