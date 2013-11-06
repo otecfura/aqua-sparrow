@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
 import ioio.lib.api.DigitalOutput;
-import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
@@ -31,7 +30,6 @@ public class SparrowService extends IOIOService {
     private Resources res;
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
-    private DigitalOutput digitalOutputPinLed;
     private BroadcastReceiver SmsReceiver;
 
     {
@@ -89,25 +87,21 @@ public class SparrowService extends IOIOService {
 
     private void openValve(){
         sendLogToUI(res.getString(R.string.open_valve));
-        turnLedOn();
-    }
-
-    private void closeValve(){
-        sendLogToUI(res.getString(R.string.close_valve));
-        turnLedOff();
-    }
-
-    private void turnLedOn(){
         try {
-            digitalOutputPinLed.write(false);
+            if(valvePin !=null){
+                valvePin.write(false);
+            }
         } catch (ConnectionLostException e) {
             e.printStackTrace();
         }
     }
 
-    private void turnLedOff(){
+    private void closeValve(){
+        sendLogToUI(res.getString(R.string.close_valve));
         try {
-            digitalOutputPinLed.write(true);
+            if(valvePin !=null){
+                valvePin.write(true);
+            }
         } catch (ConnectionLostException e) {
             e.printStackTrace();
         }
@@ -123,15 +117,13 @@ public class SparrowService extends IOIOService {
         super.onStart(intent, startId);
         res = getResources();
         sendLogToUI(res.getString(R.string.service_started));
-        Notification notice = createNotification();
-        //startForeground(SparrowConstants.NOTIFICATION_ID, notice);
         RegisterLogsReceiver();
         createAndAddListenerToParser();
 
     }
 
     private void createAndAddListenerToParser(){
-        sendLogToUI(res.getString(R.string.register_listener));
+
         sparrowSmsParser=new SparrowSmsParser();
         sparrowSmsParser.addListener(SmsListener);
     }
@@ -139,7 +131,6 @@ public class SparrowService extends IOIOService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopForeground(true);
         unregisterReceiver(SmsReceiver);
         sendLogToUI(res.getString(R.string.service_destroyed));
     }
@@ -152,7 +143,7 @@ public class SparrowService extends IOIOService {
             @Override
             protected void setup(){
                 try {
-                    digitalOutputPinLed = ioio_.openDigitalOutput(IOIO.LED_PIN,true);
+                    valvePin = ioio_.openDigitalOutput(IOIO_BOARD_PIN_NUMBER,true);
                 } catch (ConnectionLostException e) {
                     sendLogToUI(res.getString(R.string.connection_lost));
                 }
