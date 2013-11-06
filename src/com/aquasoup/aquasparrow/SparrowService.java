@@ -1,6 +1,7 @@
 package com.aquasoup.aquasparrow;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,23 +22,25 @@ import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOService;
 
 public class SparrowService extends IOIOService {
-	private static final int IOIO_BOARD_PIN_NUMBER = 13;
+
+    private static final int IOIO_BOARD_PIN_NUMBER = 13;
     private static final long TIME_TO_FINISH = 1000*480;
     private static final long TIME_TICK = 1000;
     private static final String INTENT_SMS_FILTER = "android.provider.Telephony.SMS_RECEIVED";
 
-    private Context ctx = SparrowService.this;
+    private Context ctx;
     private Resources res;
     private DigitalOutput valvePin;
     private SparrowSmsParser sparrowSmsParser;
     private BroadcastReceiver SmsReceiver;
+    private NotificationManager nm;
 
     {
         SmsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String messageBody="";
-                SmsMessage[] smsMessage=null;
+                SmsMessage[] smsMessage;
                 Bundle bundle= intent.getExtras();
 
                 sendLogToUI(res.getString(R.string.command_obtained));
@@ -83,12 +86,16 @@ public class SparrowService extends IOIOService {
         public void badSmsCode() {
             sendLogToUI(res.getString(R.string.bad_command));
         }
-};
+    };
+
+    public SparrowService() {
+        ctx = SparrowService.this;
+    }
 
     private void openValve(){
         sendLogToUI(res.getString(R.string.open_valve));
         try {
-            if(valvePin !=null){
+            if(valvePin != null){
                 valvePin.write(false);
             }
         } catch (ConnectionLostException e) {
@@ -99,7 +106,7 @@ public class SparrowService extends IOIOService {
     private void closeValve(){
         sendLogToUI(res.getString(R.string.close_valve));
         try {
-            if(valvePin !=null){
+            if(valvePin != null){
                 valvePin.write(true);
             }
         } catch (ConnectionLostException e) {
@@ -118,8 +125,18 @@ public class SparrowService extends IOIOService {
         res = getResources();
         sendLogToUI(res.getString(R.string.service_started));
         RegisterLogsReceiver();
+        startNotification();
         createAndAddListenerToParser();
+    }
 
+    private void startNotification(){
+        Notification notice=createNotification();
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(SparrowConstants.NOTIFICATION_ID, notice);
+    }
+
+    private void stopNotification(){
+        nm.cancel(SparrowConstants.NOTIFICATION_ID);
     }
 
     private void createAndAddListenerToParser(){
@@ -132,6 +149,7 @@ public class SparrowService extends IOIOService {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(SmsReceiver);
+        stopNotification();
         sendLogToUI(res.getString(R.string.service_destroyed));
     }
 
